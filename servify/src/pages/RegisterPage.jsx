@@ -1,47 +1,56 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-
-export default function LoginPage() {
+export default function RegisterPage() {
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
+
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+    });
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
 
-    /* ── Email/Password Login ── */
+    /* ── Register ── */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
 
-        if (!form.email || !form.password) return setError("All fields are required.");
-        if (form.password.length < 6) return setError("Password must be at least 6 characters.");
+        if (!form.name || !form.email || !form.password || !form.confirmPassword)
+            return setError("All fields are required.");
+
+        if (form.password.length < 6)
+            return setError("Password must be at least 6 characters.");
+
+        if (form.password !== form.confirmPassword)
+            return setError("Passwords do not match.");
 
         setLoading(true);
         try {
-            await signInWithEmailAndPassword(auth, form.email, form.password);
-            navigate("/services");
+            console.log("REGISTER:", form);
+            navigate("/login");
         } catch (err) {
-            setError(err.code === "auth/invalid-credential"
-                ? "Invalid email or password."
-                : "Login failed. Please try again.");
+            setError("Registration failed. Try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    /* ── Google OAuth ── */
+    /* ── Google Register ── */
     const handleGoogle = async () => {
         setError("");
         setLoading(true);
         try {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+            console.log("Google Register");
             navigate("/services");
         } catch (err) {
-            setError("Google sign-in failed. Please try again.");
+            setError("Google sign-up failed.");
         } finally {
             setLoading(false);
         }
@@ -49,11 +58,12 @@ export default function LoginPage() {
 
     return (
         <div>
+
             {/* NAVBAR */}
             <nav className="navbar">
                 <Link to="/" className="logo">Servi<span>fy</span></Link>
                 <div className="nav-actions">
-                    <Link to="/register" className="btn-register">Create Account</Link>
+                    <Link to="/login" className="btn-signin">Sign In</Link>
                 </div>
             </nav>
 
@@ -62,13 +72,13 @@ export default function LoginPage() {
                 <div className="auth-card">
                     <div className="auth-logo-mark">✦</div>
 
-                    <p className="section-label">Access</p>
-                    <h2 className="section-title">Welcome back</h2>
-                    <p className="auth-sub">Sign in to manage your bookings and services.</p>
+                    <p className="section-label">Join</p>
+                    <h2 className="section-title">Create account</h2>
+                    <p className="auth-sub">Start booking services in seconds.</p>
 
                     {error && <p className="error-msg">{error}</p>}
 
-                    {/* Google Button */}
+                    {/* Google Button — same SVG as LoginPage */}
                     <button
                         className="google-btn"
                         onClick={handleGoogle}
@@ -84,10 +94,21 @@ export default function LoginPage() {
                         Continue with Google
                     </button>
 
-                    <div className="divider"><span>or sign in with email</span></div>
+                    <div className="divider"><span>or sign up with email</span></div>
 
-                    {/* Email/Password Form */}
+                    {/* Form */}
                     <form onSubmit={handleSubmit} className="input-group">
+
+                        <input
+                            className="input-field"
+                            type="text"
+                            name="name"
+                            placeholder="Full name"
+                            value={form.name}
+                            onChange={handleChange}
+                            autoComplete="name"
+                        />
+
                         <input
                             className="input-field"
                             type="email"
@@ -97,6 +118,7 @@ export default function LoginPage() {
                             onChange={handleChange}
                             autoComplete="email"
                         />
+
                         <input
                             className="input-field"
                             type="password"
@@ -104,21 +126,28 @@ export default function LoginPage() {
                             placeholder="Password"
                             value={form.password}
                             onChange={handleChange}
-                            autoComplete="current-password"
+                            autoComplete="new-password"
                         />
 
-                        <div className="forgot">
-                            <Link to="/forgot-password">Forgot password?</Link>
-                        </div>
+                        <input
+                            className="input-field"
+                            type="password"
+                            name="confirmPassword"
+                            placeholder="Confirm password"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
+                            autoComplete="new-password"
+                        />
 
                         <button className="btn-primary" type="submit" disabled={loading}>
-                            {loading ? "Signing in…" : "Login"}
+                            {loading ? "Creating account…" : "Register"}
                         </button>
                     </form>
 
                     <p className="auth-switch">
-                        Don't have an account? <Link to="/register">Create one</Link>
+                        Already have an account? <Link to="/login">Sign in</Link>
                     </p>
+
                 </div>
             </div>
         </div>
