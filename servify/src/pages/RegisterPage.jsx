@@ -44,23 +44,23 @@ export default function RegisterPage() {
 
     /* ── Google Register ── */
     const handleGoogle = async () => {
-    setError("");
-    setLoading(true);
+        setError("");
+        setLoading(true);
 
-    try {
-        const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
 
-        console.log("Google user:", result.user);
+            console.log("Google user:", result.user);
 
-        navigate("/services");
+            navigate("/services");
 
-    } catch (err) {
-        setError(err.message);
-    } finally {
-        setLoading(false);
-    }
-};
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div>
