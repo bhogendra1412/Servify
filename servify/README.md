@@ -1,16 +1,96 @@
-# React + Vite
+# 🚀 Servify — Service Booking Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Servify is a full-stack service booking web application where users can browse services, select time slots, and book appointments seamlessly.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+* 🔍 Browse multiple services (beauty, home, tech, etc.)
+* 📅 Book services with time slots
+* 🔐 Authentication (Email + Google)
+* ⚡ Fast UI with React + Vite
+* 🎨 Modern responsive design
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Frontend:** React, Vite
+* **Routing:** React Router DOM
+* **Styling:** Custom CSS
+* **Authentication:** Firebase (in progress)
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+ ├── pages/
+ │    ├── LandingPage.jsx
+ │    ├── ServicesPage.jsx
+ │    ├── LoginPage.jsx
+ │    ├── RegisterPage.jsx
+ │    └── BookPage.jsx
+ ├── styles/
+ │    └── global.css
+ ├── App.jsx
+ └── main.jsx
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repo
+
+```
+git clone https://github.com/bhogendra1412/Servify.git
+cd Servify/servify
+```
+
+### 2. Install dependencies
+
+```
+npm install
+```
+
+### 3. Run development server
+
+```
+npm run dev
+```
+
+### 4. Open in browser
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🌐 Routes
+
+| Route       | Description       |
+| ----------- | ----------------- |
+| `/`         | Landing Page      |
+| `/services` | Browse services   |
+| `/login`    | User login        |
+| `/register` | User registration |
+| `/book/:id` | Booking page      |
+
+---
+
+## 🚧 Upcoming Improvements
+
+* 🔐 Full Firebase authentication integration
+* 🧠 Protected routes
+* 📦 Backend (Node.js + MongoDB)
+* 💳 Payment integration
+
+---
+
+## 📌 Note
+
+This project is under active development (Hackathon + Learning Phase).
