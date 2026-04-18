@@ -1158,6 +1158,21 @@ body {
   padding: 0.5rem 1.2rem;
 }
 
+<<<<<<< HEAD
+=======
+/* ══════════════════════════════
+   BOOKING PAGE — FULL REWRITE
+══════════════════════════════ */
+
+.nav-welcome {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0.5rem 1.2rem;
+}
+
+>>>>>>> 82e629ecfbe0d80c55946c0e4066b38ea64cad25
 .booking-breadcrumb {
   max-width: 1100px;
   margin: 0 auto;
