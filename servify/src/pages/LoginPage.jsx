@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 
 export default function LoginPage() {
@@ -32,6 +33,7 @@ export default function LoginPage() {
         }
     };
 
+<<<<<<< HEAD
     /* ── Google OAuth ── */
     const handleGoogle = async () => {
         setError("");
@@ -45,7 +47,34 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
+=======
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!form.email || !form.password) {
+            return setError("All fields required");
+        }
+
+        if (form.password.length < 6) {
+            return setError("Password must be at least 6 chars");
+        }
+
+        try {
+            // ✅ Firebase login
+            const userCredential = await loginUser(form.email, form.password);
+
+            console.log("Logged in user:", userCredential.user);
+
+            // ✅ Navigate after success
+            navigate("/services");
+
+        } catch (err) {
+            console.log(err);
+            setError(err.message); // show firebase error
+        }
+>>>>>>> 2fe5dffb42eb8d184e5d63fddcb301b519eecf4c
     };
+
 
     return (
         <div>

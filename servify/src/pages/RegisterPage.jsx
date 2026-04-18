@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { registerUser } from "../services/authService";
+import { db } from "../firebase/config";
+import { setDoc, doc } from "firebase/firestore";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -20,25 +23,22 @@ export default function RegisterPage() {
     /* ── Register ── */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-
-        if (!form.name || !form.email || !form.password || !form.confirmPassword)
-            return setError("All fields are required.");
-
-        if (form.password.length < 6)
-            return setError("Password must be at least 6 characters.");
-
-        if (form.password !== form.confirmPassword)
-            return setError("Passwords do not match.");
-
-        setLoading(true);
         try {
-            console.log("REGISTER:", form);
+            const userCredential = await registerUser(form.email, form.password);
+
+            console.log("User created:", userCredential.user);
+
+            // Store extra user data in Firestore
+            await setDoc(doc(db, "users", userCredential.user.uid), {
+                name: form.name,
+                email: form.email,
+                createdAt: new Date()
+            });
+
             navigate("/login");
+
         } catch (err) {
-            setError("Registration failed. Try again.");
-        } finally {
-            setLoading(false);
+            setError(err.message);
         }
     };
 
@@ -46,11 +46,17 @@ export default function RegisterPage() {
     const handleGoogle = async () => {
         setError("");
         setLoading(true);
+
         try {
-            console.log("Google Register");
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+
+            console.log("Google user:", result.user);
+
             navigate("/services");
+
         } catch (err) {
-            setError("Google sign-up failed.");
+            setError(err.message);
         } finally {
             setLoading(false);
         }

@@ -3,6 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import ServicesPage from "./pages/ServicePage";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
+
 function App() {
   return (
     <BrowserRouter>
