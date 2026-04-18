@@ -122,7 +122,6 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer className="footer">
         <span className="logo">Servi<span>fy</span></span>
-        <span>Built for Hackathon 2025 · MERN + Firebase</span>
         <div className="footer-links">
           <a href="https://github.com">GitHub</a>
           <a href="#">Docs</a>

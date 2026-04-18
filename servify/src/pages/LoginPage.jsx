@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function LoginPage() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!form.email || !form.password) {
@@ -29,10 +30,21 @@ export default function LoginPage() {
             return setError("Password must be at least 6 chars");
         }
 
-        console.log(form);
+        try {
+            // ✅ Firebase login
+            const userCredential = await loginUser(form.email, form.password);
 
-        navigate("/services");
+            console.log("Logged in user:", userCredential.user);
+
+            // ✅ Navigate after success
+            navigate("/services");
+
+        } catch (err) {
+            console.log(err);
+            setError(err.message); // show firebase error
+        }
     };
+
 
     return (
         <div>
