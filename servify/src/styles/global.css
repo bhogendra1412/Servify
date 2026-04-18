@@ -657,3 +657,229 @@ body {
   .services-grid-full { grid-template-columns: 1fr; }
   .filter-row { gap: 0.5rem; }
 }
+
+
+
+/* ══════════════════════════════
+   NAVBAR WELCOME STATE
+══════════════════════════════ */
+.nav-welcome {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0.5rem 1.2rem;
+}
+
+/* ══════════════════════════════
+   BOOKING PAGE
+══════════════════════════════ */
+.booking-breadcrumb {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 0;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.booking-breadcrumb a {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.booking-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 5rem;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* LEFT PANEL */
+.booking-slots-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 2.5rem;
+}
+
+.booking-panel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.75rem;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.slot-btn {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.slot-btn:hover:not(.slot-btn-disabled) {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-light);
+}
+
+.slot-btn-active {
+  background: var(--green) !important;
+  border-color: var(--green) !important;
+  color: var(--white) !important;
+  font-weight: 700 !important;
+}
+
+.slot-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.booking-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn-book-main {
+  width: 100%;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-book-main:hover {
+  background: var(--green);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(26, 107, 74, 0.25);
+}
+
+.booking-success {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--green-light);
+  border: 1.5px solid rgba(26, 107, 74, 0.25);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+.booking-success-icon { font-size: 1.75rem; }
+
+.booking-success-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.booking-success-sub {
+  font-size: 0.85rem;
+  color: var(--green);
+  margin-top: 0.2rem;
+}
+
+/* RIGHT PANEL */
+.booking-service-panel { position: sticky; top: 90px; }
+
+.booking-service-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bsc-emoji { font-size: 3rem; }
+
+.bsc-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.bsc-desc {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.bsc-meta {
+  display: flex;
+  gap: 0;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.bsc-meta-item {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bsc-divider {
+  width: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.bsc-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.bsc-meta-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+  .booking-service-panel {
+    position: static;
+    order: -1;
+  }
+}
