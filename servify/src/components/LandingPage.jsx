@@ -49,12 +49,7 @@ export default function LandingPage() {
         </p>
 
         <div className="hero-ctas">
-          <Link to="/register" className="btn-primary">
-            Get Started Free →
-          </Link>
-          <a href="#services" className="btn-outline">
-            Browse Services
-          </a>
+          <Link to="/services" className="btn-outline">Browse Services</Link>
         </div>
 
         <div className="hero-stats">
