@@ -1,4 +1,4 @@
-const BASE = "http://localhost:5000/api";
+const BASE = "https://servify-1-q2qu.onrender.com/api";
 
 // Get taken slots for a service on a specific date
 export const getTakenSlots = async (serviceId, date) => {
