@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { auth } from "../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { getTakenSlots, createBooking } from "../services/bookingService";
 import "../styles/global.css";
 
 const ALL_SERVICES = [
@@ -22,83 +25,94 @@ const ALL_SERVICES = [
 ];
 
 const ALL_SLOTS = ["9:00 AM","10:00 AM","11:00 AM","12:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM"];
-// Simulated taken slots per day-of-month key — replace with real API data later
-const TAKEN_BY_DAY = { 1: ["10:00 AM","3:00 PM"], 2: ["9:00 AM","12:00 PM"], 5: ["11:00 AM","4:00 PM"] };
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DOW = ["Su","Mo","Tu","We","Th","Fr","Sa"];
-
-const user = { name: "Pavan" }; // swap with Firebase auth.currentUser
+const DOW    = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 function Calendar({ selectedDate, onSelect }) {
   const today = new Date(); today.setHours(0,0,0,0);
-  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewYear,  setViewYear]  = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
 
-  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
-  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
+  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y-1); } else setViewMonth(m => m-1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0);  setViewYear(y => y+1); } else setViewMonth(m => m+1); };
 
   return (
     <div>
       <div className="bk-cal-header">
         <span className="bk-cal-month">{MONTHS[viewMonth]} {viewYear}</span>
-        <div style={{ display: "flex", gap: "6px" }}>
+        <div style={{ display:"flex", gap:"6px" }}>
           <button className="bk-cal-nav" onClick={prevMonth}>‹</button>
           <button className="bk-cal-nav" onClick={nextMonth}>›</button>
         </div>
       </div>
       <div className="bk-cal-grid">
         {DOW.map(d => <div key={d} className="bk-cal-dow">{d}</div>)}
-        {Array(firstDay).fill(null).map((_, i) => <div key={`e${i}`} />)}
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const d = i + 1;
+        {Array(firstDay).fill(null).map((_,i) => <div key={`e${i}`}/>)}
+        {Array.from({ length: daysInMonth }, (_,i) => {
+          const d  = i + 1;
           const dt = new Date(viewYear, viewMonth, d);
-          const isPast = dt < today;
-          const isToday = dt.getTime() === today.getTime();
+          const isPast     = dt < today;
+          const isToday    = dt.getTime() === today.getTime();
           const isSelected = selectedDate && dt.getTime() === selectedDate.getTime();
           let cls = "bk-cal-day";
-          if (isPast) cls += " bk-cal-past";
+          if (isPast)       cls += " bk-cal-past";
           else if (isSelected) cls += " bk-cal-selected";
           else if (isToday) cls += " bk-cal-today";
           return (
-            <div key={d} className={cls} onClick={() => !isPast && onSelect(dt)}>
-              {d}
-            </div>
+            <div key={d} className={cls} onClick={() => !isPast && onSelect(dt)}>{d}</div>
           );
         })}
       </div>
       <div className="bk-legend">
-        <span><span className="bk-dot bk-dot-today" />Today</span>
-        <span><span className="bk-dot bk-dot-selected" />Selected</span>
-        <span><span className="bk-dot bk-dot-past" />Past</span>
+        <span><span className="bk-dot bk-dot-today"/>Today</span>
+        <span><span className="bk-dot bk-dot-selected"/>Selected</span>
+        <span><span className="bk-dot bk-dot-past"/>Past</span>
       </div>
     </div>
   );
 }
 
 export default function BookingPage() {
-  const { id } = useParams();
-  const service = ALL_SERVICES.find(s => s.id === Number(id));
+  const { id }   = useParams();
+  const service  = ALL_SERVICES.find(s => s.id === Number(id));
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [booked, setBooked] = useState(false);
-  const [error, setError] = useState("");
+  const [takenSlots,   setTakenSlots]   = useState([]);
+  const [booked,       setBooked]       = useState(false);
+  const [error,        setError]        = useState("");
+  const [currentUser,  setCurrentUser]  = useState(null);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // Get logged in Firebase user
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setCurrentUser(u));
+    return () => unsub();
+  }, []);
+
+  // Fetch real taken slots from MongoDB when date changes
+  useEffect(() => {
+    if (!selectedDate || !service) return;
+    const dateStr = selectedDate.toISOString().split("T")[0]; // "2025-04-19"
+    setLoadingSlots(true);
+    getTakenSlots(String(service.id), dateStr)
+      .then(slots => setTakenSlots(slots))
+      .finally(() => setLoadingSlots(false));
+  }, [selectedDate]);
 
   if (!service) return (
-    <div style={{ textAlign: "center", padding: "6rem 2rem" }}>
-      <p style={{ fontSize: "3rem" }}>❓</p>
+    <div style={{ textAlign:"center", padding:"6rem 2rem" }}>
+      <p style={{ fontSize:"3rem" }}>❓</p>
       <h2>Service not found</h2>
-      <Link to="/services" className="btn-book" style={{ marginTop: "1rem", display: "inline-block" }}>
+      <Link to="/services" className="btn-book" style={{ marginTop:"1rem", display:"inline-block" }}>
         Back to Services
       </Link>
     </div>
   );
-
-  const takenSlots = selectedDate ? (TAKEN_BY_DAY[selectedDate.getDate()] || []) : [];
 
   const handleDateSelect = (dt) => {
     if (booked) return;
@@ -107,16 +121,31 @@ export default function BookingPage() {
     setError("");
   };
 
-  const handleBook = () => {
+  const handleBook = async () => {
     if (!selectedDate) { setError("Please select a date first."); return; }
-    if (!selectedSlot) { setError("Please select a time slot."); return; }
+    if (!selectedSlot) { setError("Please select a time slot.");  return; }
+    if (!currentUser)  { setError("Please login to book a slot."); return; }
+
     setError("");
-    setBooked(true);
+    try {
+      const dateStr = selectedDate.toISOString().split("T")[0];
+      await createBooking({
+        firebaseId: currentUser.uid,
+        serviceId:  String(service.id),
+        date:       dateStr,
+        timeSlot:   selectedSlot,
+      });
+      setBooked(true);
+    } catch (err) {
+      setError(err.message); // "Slot already booked" from backend
+    }
   };
 
   const formattedDate = selectedDate
     ? `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}`
     : null;
+
+  const displayName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "User";
 
   return (
     <div>
@@ -124,12 +153,10 @@ export default function BookingPage() {
       <nav className="navbar">
         <Link to="/" className="logo">Servi<span>fy</span></Link>
         <div className="nav-actions">
-          {user
-            ? <p className="nav-welcome">Welcome back, {user.name} 👋</p>
-            : (<>
-                <Link to="/login" className="btn-signin">Sign In</Link>
-                <Link to="/register" className="btn-register">Create Account</Link>
-              </>)
+          {currentUser
+            ? <p className="nav-welcome">👋 Welcome, <strong>{displayName}</strong></p>
+            : <><Link to="/login" className="btn-signin">Sign In</Link>
+               <Link to="/register" className="btn-register">Create Account</Link></>
           }
         </div>
       </nav>
@@ -143,9 +170,9 @@ export default function BookingPage() {
       <div className="booking-layout">
 
         {/* LEFT COLUMN */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
 
-          {/* CALENDAR PANEL */}
+          {/* CALENDAR */}
           <div className="booking-panel">
             <p className="section-label">Step 1 — Date</p>
             <h2 className="booking-panel-title">
@@ -154,7 +181,7 @@ export default function BookingPage() {
             <Calendar selectedDate={selectedDate} onSelect={handleDateSelect} />
           </div>
 
-          {/* SLOTS PANEL */}
+          {/* SLOTS */}
           <div className="booking-panel">
             <p className="section-label">Step 2 — Time</p>
             <h2 className="booking-panel-title">
@@ -163,22 +190,21 @@ export default function BookingPage() {
 
             {!selectedDate ? (
               <p className="bk-hint">Select a date above to see available slots.</p>
+            ) : loadingSlots ? (
+              <p className="bk-hint">Loading slots…</p>
             ) : (
               <>
                 <div className="slots-grid">
                   {ALL_SLOTS.map(slot => {
-                    const isTaken = takenSlots.includes(slot);
+                    const isTaken    = takenSlots.includes(slot);
                     const isSelected = selectedSlot === slot;
                     let cls = "slot-btn";
-                    if (isTaken) cls += " slot-taken";
+                    if (isTaken)      cls += " slot-taken";
                     else if (isSelected) cls += " slot-btn-active";
                     return (
-                      <button
-                        key={slot}
-                        className={cls}
+                      <button key={slot} className={cls}
                         onClick={() => { if (!isTaken && !booked) { setSelectedSlot(slot); setError(""); } }}
-                        disabled={isTaken || booked}
-                      >
+                        disabled={isTaken || booked}>
                         {slot}
                         {isTaken && <span className="taken-badge">Full</span>}
                       </button>
@@ -186,9 +212,9 @@ export default function BookingPage() {
                   })}
                 </div>
                 <div className="bk-legend">
-                  <span><span className="bk-dot bk-dot-avail" />Available</span>
-                  <span><span className="bk-dot bk-dot-selected" />Selected</span>
-                  <span><span className="bk-dot bk-dot-taken" />Taken</span>
+                  <span><span className="bk-dot bk-dot-avail"/>Available</span>
+                  <span><span className="bk-dot bk-dot-selected"/>Selected</span>
+                  <span><span className="bk-dot bk-dot-taken"/>Taken</span>
                 </div>
               </>
             )}
@@ -213,7 +239,7 @@ export default function BookingPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN — SERVICE CARD */}
+        {/* RIGHT COLUMN — SERVICE SUMMARY */}
         <div className="booking-service-panel">
           <div className="booking-service-card">
             <div className="bsc-emoji">{service.emoji}</div>
@@ -225,25 +251,24 @@ export default function BookingPage() {
                 <span className="bsc-meta-label">Price</span>
                 <span className="bsc-meta-val">₹{service.price}</span>
               </div>
-              <div className="bsc-divider" />
+              <div className="bsc-divider"/>
               <div className="bsc-meta-item">
                 <span className="bsc-meta-label">Duration</span>
                 <span className="bsc-meta-val">{service.duration}</span>
               </div>
             </div>
 
-            {/* BOOKING SUMMARY */}
-            <p className="section-label" style={{ marginTop: "1.25rem", marginBottom: "0.6rem" }}>Booking summary</p>
+            <p className="section-label" style={{ marginTop:"1.25rem", marginBottom:"0.6rem" }}>Booking summary</p>
             <div className="bk-summary">
               <div className="bk-summary-row">
                 <span className="bk-summary-lbl">Date</span>
-                <span className={`bk-summary-val ${!selectedDate ? "bk-summary-pending" : ""}`}>
+                <span className={`bk-summary-val ${!selectedDate ? "bk-summary-pending":""}`}>
                   {formattedDate || "Not selected"}
                 </span>
               </div>
               <div className="bk-summary-row">
                 <span className="bk-summary-lbl">Time</span>
-                <span className={`bk-summary-val ${!selectedSlot ? "bk-summary-pending" : ""}`}>
+                <span className={`bk-summary-val ${!selectedSlot ? "bk-summary-pending":""}`}>
                   {selectedSlot || "Not selected"}
                 </span>
               </div>
@@ -265,10 +290,7 @@ export default function BookingPage() {
       <footer className="footer">
         <Link to="/" className="logo">Servi<span>fy</span></Link>
         <span>Built for Hackathon 2025 · MERN + Firebase</span>
-        <div className="footer-links">
-          <a href="https://github.com">GitHub</a>
-          <a href="#">Docs</a>
-        </div>
+        <div className="footer-links"><a href="https://github.com">GitHub</a></div>
       </footer>
     </div>
   );
