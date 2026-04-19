@@ -7,6 +7,9 @@ import {
   signOut,
 } from "firebase/auth";
 
+const BASE_URL="https://servify-1-q2qu.onrender.com";
+
+
 export const registerUser = (email, password) =>
   createUserWithEmailAndPassword(auth, email, password);
 
@@ -23,7 +26,7 @@ export const logoutUser = () => signOut(auth);
 // Sync user to MongoDB after login/register
 export const syncUserToMongoDB = async (user) => {
   try {
-    await fetch("http://localhost:5000/api/auth/sync", {
+    await fetch(`${BASE_URL}/api/auth/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -40,7 +43,7 @@ export const syncUserToMongoDB = async (user) => {
 // Get user role from MongoDB
 export const getUserRole = async (firebaseId) => {
   try {
-    const res  = await fetch(`http://localhost:5000/api/auth/role/${firebaseId}`);
+    const res  = await fetch(`${BASE_URL}/api/auth/role/${firebaseId}`);
     const data = await res.json();
     return data.role || "user";
   } catch (err) {
