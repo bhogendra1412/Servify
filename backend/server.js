@@ -5,7 +5,14 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(cors({ origin: ["https://servify-2.vercel.app//","http://localhost:5173"] }));
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://servify-2.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
